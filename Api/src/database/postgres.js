@@ -1,5 +1,8 @@
 import pkg from "pg";
 
+pkg.types.setTypeParser(pkg.types.builtins.NUMERIC, (value) => parseFloat(value));
+
+
 let postgres;
 
 /**
@@ -57,7 +60,7 @@ export async function CriarTabelas() {
    await db.query(`
    CREATE TABLE IF NOT EXISTS public."Venda"
    (
-       codigo integer NOT NULL,
+       codigo integer NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 9999999 CACHE 1 ),
        produto integer NOT NULL,
        quantidade integer,
        valor_unitario numeric(6, 2),

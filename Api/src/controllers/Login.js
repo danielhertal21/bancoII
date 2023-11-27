@@ -23,7 +23,7 @@ export default async (req, res) => {
    }
 
    const pg = await postgres();
-
+   
    let dados = await pg.query('SELECT codigo, nome, email, senha from "Cliente" where email like $1;', [email]);
 
    if (!dados.rowCount) return res.status(401).send({ error: "Email ou senha invalido" });
