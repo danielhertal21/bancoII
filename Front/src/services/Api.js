@@ -17,6 +17,7 @@ export const createSession = async (dados) => {
 }
 
 export const registroSession = async (dados) => {
+
    try {
       const retorno = await api.post('/cadastro', dados);
       return retorno.data;
@@ -27,4 +28,31 @@ export const registroSession = async (dados) => {
 
 export async function getProtudos() {
    return api.get('/produtos');
+}
+
+export async function postVenda(dados) {
+   try {
+      const retorno = await api.post('/venda', dados, { headers: { 'Authorization': localStorage.getItem('token') } });
+      return retorno.data;
+   } catch (e) {
+      return e.response?.data;
+   }
+}
+
+export async function getVendas() {
+   try {
+      const retorno = await api.get('/venda');
+      return retorno.data;
+   } catch (e) {
+      return e.response?.data;
+   }
+}
+
+export async function getIndicacao() {
+   try {
+      const retorno = await api.get('/indicacao');
+      return retorno.data;
+   } catch (e) {
+      return e.response?.data;
+   }
 }

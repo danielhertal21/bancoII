@@ -19,7 +19,7 @@ export default (req, res, next) => {
       if (err) return res.status(401).send({ error: "Token expirado" });
 
       req.userId = decoded.codigo;
-      req.userName = decoded.name;
+      req.userName = decoded.nome;
       req.userEmail = decoded.email;
    });
 

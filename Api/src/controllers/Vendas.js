@@ -1,8 +1,10 @@
 import postgres from '../database/postgres.js'
 import redis from '../database/redis.js'
+import mongo from '../database/mongo.js'
 
 const pg = await postgres();
 const rg = await redis();
+const mg = await mongo();
 
 /**
  * 
@@ -10,22 +12,28 @@ const rg = await redis();
  * @param {import("express").Response} res 
  */
 async function criarVenda(req, res) {
-   const { produto, quantidade } = req.body;
+   const { produto, quantidade, nome, email } = req.body;
 
    if (!produto) return res.status(400).json({ error: "Produto não informado." });
    if (!quantidade || quantidade < 1) return res.status(400).json({ error: "Quantidade não informado." });
+   if (!nome) return res.status(400).json({ error: 'Nome não informado' });
+   if (!email) return res.status(400).json({ error: 'Email não informado.' });
 
-   let prod = await pg.query('SELECT codigo, preco FROM "Produto" where codigo = $1', [produto]);
+   let prod = await pg.query('SELECT codigo, nome, preco FROM "Produto" where codigo = $1', [produto]);
 
    if (!prod.rowCount) return res.status(400).json({ error: 'Produto não encontrado.' });
 
    prod = prod.rows[0];
 
    try {
-      await pg.query(`INSERT INTO "Venda" (produto,quantidade,valor_unitario,valor_total,data,cliente) VALUES($1,$2,$3,$4,$5,$6)`, [prod.codigo, quantidade, prod.preco, quantidade * prod.preco, new Date(), req.userId])
+      await pg.query(`INSERT INTO "Venda" (produto,quantidade,valor_unitario,valor_total,data,cliente) VALUES($1,$2,$3,$4,$5,$6) RETURNING codigo`, [prod.codigo, quantidade, prod.preco, quantidade * prod.preco, new Date(), req.userId])
+
+      await mg.collection('indicacoes').insertOne({ nome, email, produto_id: prod.codigo, produto: prod.nome, cliente_id: req.userId, cliente: req.userName })
+
    } catch (error) {
       return res.status(400).json({ error: 'Erro inesperado.' })
    }
+
    return res.status(201).json();
 }
 

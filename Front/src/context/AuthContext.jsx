@@ -48,7 +48,7 @@ export const AuthProvider = ({ children }) => {
    }
 
    return (
-      <AuthContext.Provider value={{ isLogin: verificaToken(), login, register, loggof, modalLogin, setModalLogin }}>
+      <AuthContext.Provider value={{ isLogin: verificaToken(), token, login, register, loggof, modalLogin, setModalLogin }}>
          {children}
       </AuthContext.Provider>
    );

@@ -18,7 +18,7 @@ async function connect() {
    await client.connect();
 
    mongo = client.db(process.env.MONGO_DATABASE);
-   // mongo.createCollection('trabalho2')
+   
    return mongo;
 }
 
