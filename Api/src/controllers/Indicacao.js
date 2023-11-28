@@ -1,21 +1,35 @@
-import redis from '../database/redis.js';
+import redis, { dataToArray } from '../database/redis.js';
 import mongo from '../database/mongo.js';
 
 const rd = await redis();
 const mg = await mongo();
 
 async function consultaIndicacao(req, res) {
-   const dados = await rd.get("indicacao")
+   try {
+      const dados = await rd.json.get("indicacao")
 
-   res.setHeader("cache", !!dados);
+      res.setHeader("cache", !!dados);
 
-   if (dados) {
-      return res.status(200).send(dados);
-   } else {
-      const data = await mg.collection('indicacoes').find().toArray();
-      console.log(data)
-      // if (data.length) rd.set('indicacao', JSON.stringify(data), { EX: process.env.REDIS_TMP_CACHE });
-      return res.send(data);
+      if (dados) {
+         return res.status(200).send(dataToArray(dados));
+      } else {
+
+         let data = await mg.collection('indicacao').find().toArray();
+
+         try {
+            await rd.json.set('indicacao', '$', {})
+            await Promise.all(data.map(async d => {
+               await rd.json.set('indicacao', `$.${d._id}`, d)
+            }))
+         } catch (e) {
+            console.log(e)
+         }
+         data = await rd.json.get("indicacao")
+         return res.json(dataToArray(data));
+      }
+   } catch (e) {
+      console.log(e)
+      return res.status(500).send()
    }
 }
 

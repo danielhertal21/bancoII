@@ -19,7 +19,20 @@ export default async function connect() {
    return redis;
 }
 
-export async function LimparRedis(){
+/**
+ * 
+ * @param {Map} data 
+ * @returns {[]}
+ */
+export function dataToArray(data) {
+   let array = []
+   for (let k in data) {
+      array.push(data[k])
+   }
+   return array
+}
+
+export async function LimparRedis() {
    let rd = await connect();
    await rd.flushAll()
 }

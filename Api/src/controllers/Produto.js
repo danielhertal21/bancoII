@@ -11,15 +11,15 @@ export default async (req, res) => {
    const rg = await redis();
    const pg = await postgres();
 
-   const dados = await rg.get("produtos")
+   const dados = await rg.json.get("produtos")
 
    res.setHeader("cache", !!dados);
 
    if (dados) {
-      return res.status(200).send(dados);
+      return res.json(dados);
    } else {
       const data = (await pg.query('SELECT * FROM "Produto";')).rows;
-      if (data.length) rg.set('produtos', JSON.stringify(data), { EX: process.env.REDIS_TMP_CACHE });
-      return res.send(data);
+      if (data.length) rg.json.set('produtos', '$', data);
+      return res.json(data);
    }
 }
