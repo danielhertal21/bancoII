@@ -12,14 +12,15 @@ import { gerarToken } from "./Login.js";
  */
 export default async (req, res) => {
 
-   let { codigo,
+   let {
       nome,
       cpf,
       email,
       senha,
       endereco,
       cidade,
-      uf } = req.body;
+      uf
+   } = req.body;
 
    if (!nome) return res.status(400).send({ error: 'Nome não informada' });
    if (!cpf) return res.status(400).send({ error: 'CPF não informada' });
